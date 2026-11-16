@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Bard's Lexicon 莎翁文青詞彙誌</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Cormorant Garamond, Playfair Display, Noto Serif TC, Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&family=Noto+Serif+TC:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <!-- Font Awesome for subtle editorial icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            parchment: '#F5F0E6',
+            parchmentDark: '#EAE2D3',
+            parchmentCard: '#FAF7F0',
+            ink: '#1C1917',
+            inkMuted: '#57534E',
+            burgundy: '#722F37',
+            burgundyLight: '#8E3B46',
+            gold: '#B8860B',
+            goldLight: '#D4AF37',
+          },
+          fontFamily: {
+            display: ['"Playfair Display"', '"Noto Serif TC"', 'serif'],
+            serifEn: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            serifTc: ['"Noto Serif TC"', 'serif'],
+            sans: ['"Inter"', 'sans-serif'],
+          },
+          boxShadow: {
+            'editorial': '0 10px 30px -10px rgba(28, 25, 23, 0.12), 0 4px 10px -4px rgba(114, 47, 55, 0.08)',
+            'card': '0 4px 20px -2px rgba(28, 25, 23, 0.08)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Subtle paper grain overlay */
+    body {
+      background-color: #F5F0E6;
+      color: #1C1917;
+      background-image: radial-gradient(rgba(114, 47, 55, 0.04) 1px, transparent 0),
+                        radial-gradient(rgba(184, 134, 11, 0.04) 1px, #F5F0E6 0);
+      background-size: 32px 32px;
+      background-position: 0 0, 16px 16px;
+      overflow-x: hidden;
+    }
+
+    /* Custom scrollbar for editorial polish */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #EAE2D3;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #B8860B;
+      border-radius: 9999px;
+    }
+
+    /* Hide scrollbar for horizontal A-Z bar on mobile while keeping scrollability */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Smooth fade animation */
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-editorial {
+      animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Speaking wave pulse */
+    @keyframes pulseRing {
+      0% { transform: scale(0.95); opacity: 0.7; }
+      70% { transform: scale(1.15); opacity: 0; }
+      100% { transform: scale(0.95); opacity: 0; }
+    }
+    .speaking-active::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 9999px;
+      border: 2px solid #722F37;
+      animation: pulseRing 1.2s infinite;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-burgundy selection:text-parchment min-h-screen flex flex-col">
+
+  <!-- Toast Notification (Replaces alert) -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300">
+    <div class="bg-ink text-parchment px-5 py-3 rounded-xl shadow-editorial border border-gold/40 flex items-center gap-3 text-sm font-serifTc">
+      <i class="fa-solid fa-feather-pointed text-goldLight"></i>
+      <span id="toast-message">已複製文青金句</span>
+    </div>
+  </div>
+
+  <!-- Top Editorial Masthead -->
+  <header class="border-b border-ink/15 bg-parchment/90 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-burgundy text-parchment flex items-center justify-center font-display font-bold text-lg shadow-sm border border-gold/50">
+          W
+        </div>
+        <div>
+          <span class="text-[11px] uppercase tracking-[0.2em] text-burgundy font-semibold block leading-none">FOLIO I · A–Z EDITION</span>
+          <h1 class="font-display text-lg sm:text-xl font-bold tracking-tight text-ink">
+            The Bard's Lexicon <span class="font-serifTc font-semibold text-base sm:text-lg text-inkMuted ml-1">莎翁文青詞彙誌</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Action Controls -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="btn-random" onclick="pickRandomWord()" class="px-3.5 py-2 rounded-full bg-burgundy hover:bg-burgundyLight text-parchment text-xs sm:text-sm font-medium transition-all shadow-sm flex items-center gap-2 active:scale-95 cursor-pointer">
+          <i class="fa-solid fa-wand-sparkles text-goldLight"></i>
+          <span class="font-serifTc">今日靈感抽籤</span>
+        </button>
+
+        <button id="btn-favorites-filter" onclick="toggleFavoritesFilter()" class="px-3.5 py-2 rounded-full border border-ink/20 hover:border-burgundy bg-parchmentCard text-ink text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 cursor-pointer">
+          <i id="fav-filter-icon" class="fa-regular fa-bookmark text-burgundy"></i>
+          <span class="font-serifTc hidden sm:inline">我的收藏</span>
+          <span id="fav-count" class="text-xs bg-parchmentDark px-1.5 py-0.5 rounded-full font-mono text-inkMuted">0</span>
+        </button>
+
+        <!-- View Switcher -->
+        <div class="bg-parchmentDark p-1 rounded-full border border-ink/10 flex items-center">
+          <button id="view-single-btn" onclick="setViewMode('single')" title="單張精讀模式" class="px-2.5 py-1 rounded-full text-xs font-medium bg-ink text-parchment transition-all cursor-pointer">
+            <i class="fa-solid fa-book-open"></i>
+          </button>
+          <button id="view-grid-btn" onclick="setViewMode('grid')" title="全覽圖鑑模式" class="px-2.5 py-1 rounded-full text-xs font-medium text-inkMuted hover:text-ink transition-all cursor-pointer">
+            <i class="fa-solid fa-border-all"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive A-Z Quick-Jump Bar -->
+    <nav aria-label="A to Z Navigation" class="border-t border-ink/10 bg-parchmentCard/80">
+      <div class="max-w-6xl mx-auto px-3 sm:px-6 py-2 flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar" id="az-nav">
+        <!-- Populated by JS -->
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Sub-banner -->
+  <section class="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-6 pb-2">
+    <div class="rounded-2xl border border-ink/15 bg-parchmentCard/90 p-5 sm:p-7 shadow-card flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative overflow-hidden">
+      <div class="absolute -right-8 -bottom-10 opacity-[0.04] pointer-events-none font-display text-[160px] leading-none select-none">
+        1623
+      </div>
+      <div class="max-w-2xl">
+        <p class="text-xs uppercase tracking-[0.22em] text-gold font-semibold mb-1.5">
+          A CURATED LEXICON FOR MODERN MELANCHOLICS
+        </p>
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-ink leading-snug">
+          以伊麗莎白時代的詩意，安放現代靈魂的微醺與憂鬱
+        </h2>
+        <p class="font-serifTc text-sm sm:text-base text-inkMuted mt-2 leading-relaxed">
+          從 A 到 Z 精選 26 個莎士比亞劇本古典詞彙。聆聽劇院級英式朗誦、鑑賞專屬木刻版畫意象，並一鍵複製適合深夜隨筆與社群貼文的文青造句。
+        </p>
+      </div>
+      <div class="flex flex-col sm:flex-row md:flex-col items-stretch sm:items-center md:items-end gap-2 shrink-0 w-full md:w-auto">
+        <div class="text-xs text-inkMuted font-serifTc bg-parchment px-3.5 py-2 rounded-xl border border-ink/10 flex items-center gap-2">
+          <i class="fa-solid fa-volume-high text-burgundy"></i>
+          <span>內建 Web Speech 朗誦與 SVG 版畫引擎</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Showcase -->
+  <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-6">
+    
+    <!-- SINGLE FEATURED CARD VIEW -->
+    <div id="single-view-container" class="animate-editorial">
+      <!-- Populated dynamically -->
+    </div>
+
+    <!-- ALL A-Z GRID VIEW -->
+    <div id="grid-view-container" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-editorial">
+      <!-- Populated dynamically -->
+    </div>
+
+    <!-- Empty Favorites State -->
+    <div id="empty-favorites-state" class="hidden text-center py-16 px-4 rounded-2xl border border-dashed border-ink/20 bg-parchmentCard/60">
+      <i class="fa-regular fa-bookmark text-4xl text-burgundy/50 mb-3"></i>
+      <h3 class="font-display text-xl font-bold text-ink">你的藏書閣尚無詞彙</h3>
+      <p class="font-serifTc text-sm text-inkMuted mt-1 mb-5">點擊卡片右上角的書籤圖示，將觸動你的莎翁詞彙收入私藏。</p>
+      <button onclick="toggleFavoritesFilter()" class="px-5 py-2.5 rounded-full bg-burgundy text-parchment text-sm font-serifTc hover:bg-burgundyLight transition cursor-pointer">
+        瀏覽全部 26 個詞彙
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Editorial Footer & Asset Guide Note -->
+  <footer class="border-t border-ink/15 bg-parchmentCard mt-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-sm text-inkMuted">
+      <div>
+        <p class="font-display font-bold text-ink text-base">The Bard's Lexicon · 莎翁文青詞彙誌</p>
+        <p class="font-serifTc text-xs mt-1 leading-relaxed max-w-xl">
+          本網站所有古典版畫插圖皆透過即時程式化 SVG 幾何美學生成；發音與戲劇朗誦採用瀏覽器原生 Web Speech API (en-GB) 驅動，無須外部圖庫或音檔即可完整離線運行。
+        </p>
+      </div>
+      <div class="flex items-center gap-4 text-xs font-serifTc">
+        <button onclick="prevWord()" class="px-3 py-1.5 rounded-lg border border-ink/15 hover:border-burgundy hover:text-burgundy transition cursor-pointer">
+          <i class="fa-solid fa-arrow-left mr-1"></i> 上一個字母
+        </button>
+        <button onclick="nextWord()" class="px-3 py-1.5 rounded-lg border border-ink/15 hover:border-burgundy hover:text-burgundy transition cursor-pointer">
+          下一個字母 <i class="fa-solid fa-arrow-right ml-1"></i>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /**
+     * Complete Dataset of 26 Shakespearean Vocabulary Words (A–Z)
+     * Includes IPA, Play Source, Famous Quote with target highlight,
+     * Traditional Chinese Literary Notes, Modern Indie/Hipster Examples,
+     * and Art Motif keys for bespoke SVG generation.
+     */
+    const LEXICON_DATA = [
+      {
+        letter: 'A',
+        word: 'Apparition',
+        pos: 'n.',
+        ipa: '/ˌæp.əˈrɪʃ.ən/',
+        play: 'Macbeth, Act 4, Scene 1',
+        quote: 'Be lion-mettled, proud, and take no care who chafes, who frets, or where conspirers are. — Stage direction: An Apparition.',
+        highlight: 'Apparition',
+        zhMeaning: '幽靈、幻影、超自然顯靈',
+        literaryNote: '比普通的 ghost 更具宿命感與戲劇張力，適合用來形容深夜腦海中轉瞬即逝的創作靈感，或某段揮之不去的舊愛殘影。',
+        modernExample: '「凌晨三點的咖啡館裡，你就像一道溫柔的 Apparition，提醒我這座城市還有詩意。」',
+        modernEn: 'Like a fleeting apparition in the late-night rain, your memory lingers.',
+        motif: 'apparition',
+        caption: '迷霧森林中的王冠幻影'
+      },
+      {
+        letter: 'B',
+        word: 'Beguile',
+        pos: 'v.',
+        ipa: '/bɪˈɡaɪl/',
+        play: 'Twelfth Night, Act 3, Scene 3',
+        quote: 'To beguile the time, look like the time; bear welcome in your eye, your hand, your tongue.',
+        highlight: 'beguile',
+        zhMeaning: '消磨（時光）、迷住、溫柔地欺騙',
+        literaryNote: '文青感極強的古典動詞。當你不想說「殺時間（kill time）」這麼粗魯的詞時，用「beguile the afternoon」來形容用一本書與手沖咖啡消磨午後，瞬間充滿法式電影質感。',
+        modernExample: '「週日午後不需要宏大的計畫，只需要一張黑膠唱片與半杯紅酒來 beguile the time。」',
+        modernEn: 'A rainy Sunday afternoon meant solely to beguile the time with old vinyls.',
+        motif: 'hourglass',
+        caption: '流逝金沙的古典沙漏'
+      },
+      {
+        letter: 'C',
+        word: 'Chide',
+        pos: 'v.',
+        ipa: '/tʃaɪd/',
+        play: 'Romeo and Juliet, Act 2, Scene 2',
+        quote: 'O, swear not by the moon, th’ inconstant moon... (Juliet gently chides Romeo for swearing by the changing moon.)',
+        highlight: 'chides',
+        zhMeaning: '輕聲責備、微嗔、埋怨',
+        literaryNote: '不同於怒氣沖沖的 scold，chide 帶有戀人間愛之深責之切的溫柔語氣，或是風吹過樹梢時發出的低語聲。',
+        modernExample: '「秋夜的微風輕聲 chide 著我忘了帶外套，一如你總愛唸我太晚睡。」',
+        modernEn: 'The autumn wind softly chides me for wandering out without a coat.',
+        motif: 'moonWindow',
+        caption: '維羅納陽台與弦月'
+      },
+      {
+        letter: 'D',
+        word: 'Dalliance',
+        pos: 'n.',
+        ipa: '/ˈdæl.i.əns/',
+        play: 'Hamlet, Act 1, Scene 3',
+        quote: 'Do not, as some ungracious pastors do, show me the steep and thorny way to heaven, whiles... himself the primrose path of dalliance treads.',
+        highlight: 'dalliance',
+        zhMeaning: '調情、嬉戲、耽溺於享樂',
+        literaryNote: '奧菲莉亞警告哥哥別只顧著走「享樂的櫻草花小徑（primrose path of dalliance）」。這個詞自帶一種慵懶、頹廢又浪漫的耽美氣息。',
+        modernExample: '「在現實的荊棘路之外，我們都需要偶爾踏上一段藝術與白日夢的 dalliance。」',
+        modernEn: 'A brief dalliance with nostalgia before Monday morning arrives.',
+        motif: 'primrose',
+        caption: '櫻草花小徑與羽毛扇'
+      },
+      {
+        letter: 'E',
+        word: 'Ere',
+        pos: 'prep. / conj.',
+        ipa: '/eər/',
+        play: 'Macbeth, Act 1, Scene 1',
+        quote: 'When the battle’s lost and won. That will be ere the set of sun.',
+        highlight: 'ere',
+        zhMeaning: '在……之前（古英語，等同 before）',
+        literaryNote: '寫詩、寫明信片或英文手寫體排版時，將平凡的 before 替換成單音節的 ere，整段文字的古典韻味與留白美感立刻倍增。',
+        modernExample: '「趕在日落之前（ere the set of sun），把這封沒寄出的信摺進舊書頁裡。」',
+        modernEn: 'Let us finish this bottle of burgundy ere the set of sun.',
+        motif: 'sunset',
+        caption: '地平線沉落的血色夕陽'
+      },
+      {
+        letter: 'F',
+        word: 'Fickle',
+        pos: 'adj.',
+        ipa: '/ˈfɪk.əl/',
+        play: 'Romeo and Juliet, Act 3, Scene 5',
+        quote: 'O Fortune, Fortune! All men call thee fickle. If thou art fickle, what dost thou with him that is renowned for faith?',
+        highlight: 'fickle',
+        zhMeaning: '善變的、無常的、反覆無常的',
+        literaryNote: '莎翁最喜歡將 fickle 與命運（Fortune）或人心並置。適合在天氣驟變的台北午後，或感嘆世事難料時優雅地嘆一口氣使用。',
+        modernExample: '「十月的天氣比戀人的承諾還要 fickle，出門記得帶傘。」',
+        modernEn: 'October weather is as fickle as Fortune herself.',
+        motif: 'wheel',
+        caption: '風中旋轉的命運之輪'
+      },
+      {
+        letter: 'G',
+        word: 'Gilded',
+        pos: 'adj.',
+        ipa: '/ˈɡɪl.dɪd/',
+        play: 'King John, Act 4, Scene 2',
+        quote: 'To gild refined gold, to paint the lily, to throw a perfume on the violet... is wasteful and ridiculous excess.',
+        highlight: 'gild',
+        zhMeaning: '鍍金的、金碧輝煌的、虛有其表的',
+        literaryNote: '英文成語「gild the lily（畫蛇添足）」正是出自這段台詞！用來諷刺過度包裝的精緻主義，或形容夕陽為舊建築鍍上一層金邊，都非常貼切。',
+        modernExample: '「真正動人的靈魂不需要過度修飾，在純白百合上鍍金（gild the lily）反而是種浪費。」',
+        modernEn: 'No filter needed; it would only gild the lily.',
+        motif: 'lily',
+        caption: '巴洛克金框與純白百合'
+      },
+      {
+        letter: 'H',
+        word: 'Hark',
+        pos: 'v. / interj.',
+        ipa: '/hɑːk/',
+        play: 'The Tempest, Act 1, Scene 2',
+        quote: 'Hark, hark! Bow-wow. The watch-dogs bark! Hark, hark! I hear the strain of strutting chanticleer.',
+        highlight: 'Hark',
+        zhMeaning: '傾聽！聽啊！',
+        literaryNote: '極具舞台戲劇感的感嘆詞。當你在獨立書店或深夜巷弄裡，突然聽見遠處傳來一首老歌的旋律時，可以對身旁的朋友低語一聲：「Hark!」',
+        modernExample: '「Hark！雨滴敲打鐵皮屋簷的節奏，聽起來像極了德布西的前奏曲。」',
+        modernEn: 'Hark! The distant sound of a cello drifting from the third-floor window.',
+        motif: 'gramophone',
+        caption: '復古黃銅留聲機與聲波'
+      },
+      {
+        letter: 'I',
+        word: 'Inconstant',
+        pos: 'adj.',
+        ipa: '/ɪnˈkɒn.stənt/',
+        play: 'Romeo and Juliet, Act 2, Scene 2',
+        quote: 'O, swear not by the moon, th’ inconstant moon, that monthly changes in her circled orb, lest that thy love prove likewise variable.',
+        highlight: 'inconstant',
+        zhMeaning: '多變的、不忠的、陰晴不定的',
+        literaryNote: '茱麗葉拒絕羅密歐指著月亮發誓，因為月亮每個月都在圓缺變化。這份對浪漫保持清醒的哲思，正是最高級的文青愛情觀。',
+        modernExample: '「別對著月亮發誓，她是如此 inconstant；不如對著這杯不會變冷的濃縮咖啡吧。」',
+        modernEn: 'Swear not by the inconstant moon, nor by fleeting Instagram stories.',
+        motif: 'phases',
+        caption: '新月與滿月的雙重星象'
+      },
+      {
+        letter: 'J',
+        word: 'Jocund',
+        pos: 'adj.',
+        ipa: '/ˈdʒɒk.ənd/',
+        play: 'Romeo and Juliet, Act 3, Scene 5',
+        quote: 'Night’s candles are burnt out, and jocund day stands tiptoe on the misty mountain tops.',
+        highlight: 'jocund',
+        zhMeaning: '歡樂的、愉悅的、輕快明朗的',
+        literaryNote: '形容「歡樂的清晨踮起腳尖站在霧氣繚繞的山巔」，畫面美得令人屏息。用來形容微醺後的輕快心境，比 happy 優雅一百倍。',
+        modernExample: '「熬夜寫完稿子推開窗，看見 jocund day 正踮著腳尖降臨在城市天際線。」',
+        modernEn: 'Sipping morning pour-over as jocund day stands tiptoe on the rooftops.',
+        motif: 'dawn',
+        caption: '晨霧山巔與破曉金光'
+      },
+      {
+        letter: 'K',
+        word: 'Knave',
+        pos: 'n.',
+        ipa: '/neɪv/',
+        play: 'Hamlet, Act 3, Scene 1',
+        quote: 'Get thee to a nunnery: why wouldst thou be a breeder of sinners? I am myself indifferent honest... We are arrant knaves all; believe none of us.',
+        highlight: 'knaves',
+        zhMeaning: '無賴、惡棍、狡猾的小人（亦指撲克牌的 J）',
+        literaryNote: '哈姆雷特對奧菲莉亞說「我們全都是徹頭徹尾的無賴（arrant knaves）」。現代適合用來幽默調侃損友，或優雅地罵一個感情裡的渣男。',
+        modernExample: '「別再為那個 arrant knave 掉眼淚了，他連你書架上的詩集都看不懂。」',
+        modernEn: 'We are arrant knaves all when it comes to keeping New Year resolutions.',
+        motif: 'knaveCard',
+        caption: '黑桃侍衛與古典匕首'
+      },
+      {
+        letter: 'L',
+        word: 'Languish',
+        pos: 'v.',
+        ipa: '/ˈlæŋ.ɡwɪʃ/',
+        play: 'Romeo and Juliet, Act 1, Scene 2',
+        quote: 'Tut, man, one fire burns out another’s burning, one pain is lessened by another’s anguish... One desperate grief cures with another’s languish.',
+        highlight: 'languish',
+        zhMeaning: '憔悴、受相思之苦、慵懶消沉',
+        literaryNote: '十九世紀浪漫派詩人最愛的詞彙之一，自帶一種蒼白、病態美與為情所困的戲劇張力。',
+        modernExample: '「沒有咖啡因的週一早晨，整個辦公室的靈魂都在無聲地 languish。」',
+        modernEn: 'Left to languish in a room full of unread books and cold tea.',
+        motif: 'wiltedRose',
+        caption: '水晶瓶中垂首的深紅玫瑰'
+      },
+      {
+        letter: 'M',
+        word: 'Melancholy',
+        pos: 'n. / adj.',
+        ipa: '/ˈmel.ən.kɒl.i/',
+        play: 'As You Like It, Act 4, Scene 1',
+        quote: 'I can suck melancholy out of a song, as a weasel sucks eggs.',
+        highlight: 'melancholy',
+        zhMeaning: '憂鬱、多愁善感、沉思的悲傷',
+        literaryNote: '文藝青年的核心靈魂底色。莎翁筆下的憂鬱從不只是單純的難過，而是一種「能從一首歌裡吸吮出詩意憂傷」的審美能力。',
+        modernExample: '「這首大提琴曲太適合雨天了，我幾乎能從每個音符裡吸吮出純粹的 melancholy。」',
+        modernEn: 'A sweet, literary melancholy that only rainy bookstores can cure.',
+        motif: 'rainWindow',
+        caption: '雨滴玻璃窗與墨水瓶'
+      },
+      {
+        letter: 'N',
+        word: 'Naught',
+        pos: 'pron. / n.',
+        ipa: '/nɔːt/',
+        play: 'King Lear, Act 1, Scene 1',
+        quote: 'Nothing will come of naught: speak again.',
+        highlight: 'naught',
+        zhMeaning: '無、零、虛無、一無所有',
+        literaryNote: '李爾王對不肯說甜言蜜語的小女兒說出這句冷冽的警告，充滿存在主義式的虛無感與宿命重量。',
+        modernExample: '「所有的執念在時間面前終將歸於 naught，不如趁現在多讀兩首詩。」',
+        modernEn: 'All our frantic plans came to naught, leaving only a quiet evening.',
+        motif: 'candleSmoke',
+        caption: '漆黑中消散的一縷燭煙'
+      },
+      {
+        letter: 'O',
+        word: 'Oft',
+        pos: 'adv.',
+        ipa: '/ɒft/',
+        play: 'Julius Caesar, Act 3, Scene 2',
+        quote: 'The evil that men do lives after them; the good is oft interred with their bones.',
+        highlight: 'oft',
+        zhMeaning: '時常、往往（often 的詩意縮寫）',
+        literaryNote: '省去了一個音節的 often，卻換來整句詩行的完美抑揚格節奏。適合用來寫人生格言或手帳短句。',
+        modernExample: '「我們時常（oft）在尋找遠方的風景，卻忘了身邊這條巷弄本身就是一首詩。」',
+        modernEn: 'How oft we mistake noise for passion, and silence for indifference.',
+        motif: 'ancientStone',
+        caption: '苔蘚覆蓋的古老石碑'
+      },
+      {
+        letter: 'P',
+        word: 'Perchance',
+        pos: 'adv.',
+        ipa: '/pəˈtʃɑːns/',
+        play: 'Hamlet, Act 3, Scene 1',
+        quote: 'To die, to sleep; to sleep, perchance to dream—ay, there’s the rub.',
+        highlight: 'perchance',
+        zhMeaning: '或許、也許、偶然',
+        literaryNote: '哈姆雷特經典獨白中最具哲學躊躇感的詞彙。比起口語的 maybe，perchance 帶著一種對命運未知性的敬畏與溫柔試探。',
+        modernExample: '「今晚早點睡吧，perchance to dream——也許在夢裡我們還能重逢。」',
+        modernEn: 'To close the laptop early, to sleep, perchance to dream.',
+        motif: 'featherDust',
+        caption: '懸浮微光中的白羽'
+      },
+      {
+        letter: 'Q',
+        word: 'Quill',
+        pos: 'n.',
+        ipa: '/kwɪl/',
+        play: 'Twelfth Night, Act 3, Scene 2',
+        quote: 'Go, write it in a martial hand; be curst and brief... let there be gall enough in thy ink, though thou write with a goose-pen (quill).',
+        highlight: 'quill',
+        zhMeaning: '羽毛筆、羽管',
+        literaryNote: '象徵書寫、創作與文字的鋒芒。莎翁提醒我們：就算用最輕盈的鵝毛筆（quill）寫字，墨水裡也要有足夠的膽汁與風骨。',
+        modernExample: '「在這個演算法時代，依然堅持用鋼筆或 quill 寫字的人，都是溫柔的叛逆者。」',
+        modernEn: 'Dipping an imaginary quill into midnight ink to write what cannot be spoken.',
+        motif: 'quill',
+        caption: '沾著深藍墨水的鵝毛筆'
+      },
+      {
+        letter: 'R',
+        word: 'Requiem',
+        pos: 'n.',
+        ipa: '/ˈrek.wi.əm/',
+        play: 'Hamlet, Act 5, Scene 1',
+        quote: 'We should profane the service of the dead to sing a requiem and such rest to her as to peace-parted souls.',
+        highlight: 'requiem',
+        zhMeaning: '安魂曲、輓歌、追思彌撒',
+        literaryNote: '自帶哥德式教堂管風琴回音的莊嚴詞彙，適合用來形容一段正式落幕的關係、一個結束的時代，或深夜聆聽的古典樂章。',
+        modernExample: '「為那段無疾而終的暗戀唱一首無聲的 requiem，然後轉身走進春天的風裡。」',
+        modernEn: 'Listening to Mozart’s Requiem while archiving old photographs.',
+        motif: 'stainedGlass',
+        caption: '哥德式彩繪玻璃光束'
+      },
+      {
+        letter: 'S',
+        word: 'Soliloquy',
+        pos: 'n.',
+        ipa: '/səˈlɪl.ə.kwi/',
+        play: 'Hamlet, Act 3, Scene 1 (Literary Form)',
+        quote: 'To be, or not to be, that is the question... (The most celebrated soliloquy in dramatic literature.)',
+        highlight: 'soliloquy',
+        zhMeaning: '獨白、自言自語（戲劇中角色獨自向觀眾剖析內心的台詞）',
+        literaryNote: '戲劇學最核心的詞彙。每個人深夜躺在床上腦內小劇場爆發、對著天花板思考人生的時刻，都是一場私密的 soliloquy。',
+        modernExample: '「IG 深夜限時動態上的長篇大論，本質上都是現代都市人的數位 soliloquy。」',
+        modernEn: 'Midnight balcony thoughts turning into an unscripted soliloquy.',
+        motif: 'spotlight',
+        caption: '聚光燈下的空舞台木椅'
+      },
+      {
+        letter: 'T',
+        word: 'Tempest',
+        pos: 'n.',
+        ipa: '/ˈtem.pɪst/',
+        play: 'The Tempest, Act 1, Scene 1',
+        quote: 'What cares these roarers for the name of king? To cabin! Silence! Trouble us not.',
+        highlight: 'Tempest',
+        zhMeaning: '暴風雨、劇烈的動盪與騷亂',
+        literaryNote: '莎士比亞最後一部獨立創作劇作的劇名。既指海上的狂風暴雨，也隱喻內心世界的劇變，以及暴風雨過後寬恕與和解的寧靜。',
+        modernExample: '「每個人的二十幾歲都經歷過幾場內心的 tempest，所幸最終都能抵達自己的島嶼。」',
+        modernEn: 'A tempest in a teacup, yet it felt like a Shakespearean tragedy.',
+        motif: 'tempestWave',
+        caption: '狂風巨浪中的古老帆船'
+      },
+      {
+        letter: 'U',
+        word: 'Undiscovered',
+        pos: 'adj.',
+        ipa: '/ˌʌn.dɪˈskʌv.əd/',
+        play: 'Hamlet, Act 3, Scene 1',
+        quote: 'The undiscovered country from whose bourn no traveller returns, puzzles the will.',
+        highlight: 'undiscovered',
+        zhMeaning: '未被發現的、未知的',
+        literaryNote: '莎翁用「undiscovered country（沒有旅人歸來的未知國度）」隱喻死亡與來世，將恐懼轉化為大航海時代般的神秘詩意。',
+        modernExample: '「未來的每一天都是一座 undiscovered country，沒有地圖，卻充滿探索的自由。」',
+        modernEn: 'Stepping off the train at a small town feels like entering an undiscovered country.',
+        motif: 'compassIsland',
+        caption: '古航海羅盤與雲海孤島'
+      },
+      {
+        letter: 'V',
+        word: 'Valiant',
+        pos: 'adj.',
+        ipa: '/ˈvæl.i.ənt/',
+        play: 'Julius Caesar, Act 2, Scene 2',
+        quote: 'Cowards die many times before their deaths; the valiant never taste of death but once.',
+        highlight: 'valiant',
+        zhMeaning: '英勇的、無畏的、豪邁的',
+        literaryNote: '「懦夫在死前已死過無數次，而勇者一生只嚐一次死的滋味。」極具力量感的古典形容詞，適合在需要鼓起勇氣做決定時默念。',
+        modernExample: '「在這個人人都在計算得失的世界裡，依然敢於真誠去愛的人，才是真正的 valiant。」',
+        modernEn: 'Be valiant enough to order the bitterest espresso and own your solitude.',
+        motif: 'shield',
+        caption: '古羅馬青銅盾牌與橄欖枝'
+      },
+      {
+        letter: 'W',
+        word: 'Woe',
+        pos: 'n.',
+        ipa: '/wəʊ/',
+        play: 'Romeo and Juliet, Act 5, Scene 3',
+        quote: 'For never was a story of more woe than this of Juliet and her Romeo.',
+        highlight: 'woe',
+        zhMeaning: '悲哀、深沉的苦難、哀痛',
+        literaryNote: '《羅密歐與茱麗葉》全劇最後一行的壓軸詞彙。短短三個字母，卻承載了古典悲劇最純粹、最令人心碎的重量。',
+        modernExample: '「把生活的瑣碎煩惱寫進日記裡，它們就不再是折磨，而成了帶點美感的詩意 woe。」',
+        modernEn: 'Never was a story of more woe than dropping a freshly brewed pour-over.',
+        motif: 'candles',
+        caption: '維羅納石階與熄滅雙燭'
+      },
+      {
+        letter: 'X',
+        word: 'Xanthippe',
+        pos: 'n.',
+        ipa: '/zænˈtɪp.i/',
+        play: 'The Taming of the Shrew, Act 1, Scene 2',
+        quote: 'Be she as foul as was Florentius’ love, as old as Sibyl, and as curst and shrewd as Socrates’ Xanthippe, she moves me not.',
+        highlight: 'Xanthippe',
+        zhMeaning: '悍婦、潑辣強勢的女性（典出哲學家蘇格拉底之妻）',
+        literaryNote: '莎劇中極為罕見以 X 開頭的典故詞！展現了莎翁對古希臘哲學八卦的信手拈來，適合用來展現博學又帶點壞心眼的英式幽默。',
+        modernExample: '「沒有一位偉大的哲學家能逃過生活瑣事的考驗，就像蘇格拉底也得面對他的 Xanthippe。」',
+        modernEn: 'Channeling my inner Xanthippe whenever someone interrupts my reading time.',
+        motif: 'bust',
+        caption: '古希臘大理石雕像與陶罐'
+      },
+      {
+        letter: 'Y',
+        word: 'Yonder',
+        pos: 'adv. / adj.',
+        ipa: '/ˈjɒn.dər/',
+        play: 'Romeo and Juliet, Act 2, Scene 2',
+        quote: 'But soft! What light through yonder window breaks? It is the east, and Juliet is the sun.',
+        highlight: 'yonder',
+        zhMeaning: '在那邊、遠處的',
+        literaryNote: '極具空間距離感與舞台視覺引導力的古詞。只要說出「yonder window」，彷彿就能看見遠方石牆高窗裡透出的一盞溫暖燭光。',
+        modernExample: '「看那邊（yonder）書店二樓亮起的暖黃燈光，那是城市夜晚最溫柔的燈塔。」',
+        modernEn: 'What warm light through yonder café window breaks?',
+        motif: 'archWindow',
+        caption: '夜色中透出燭光的拱窗'
+      },
+      {
+        letter: 'Z',
+        word: 'Zany',
+        pos: 'n. / adj.',
+        ipa: '/ˈzeɪ.ni/',
+        play: 'Love’s Labour’s Lost, Act 5, Scene 2',
+        quote: 'Some carry-tale, some please-man, some slight zany, some mumble-news, some trencher-knight, some Dick...',
+        highlight: 'zany',
+        zhMeaning: '滑稽的小丑、荒唐可笑的、怪誕可愛的',
+        literaryNote: '源自義大利即興喜劇（Commedia dell’arte）中的丑角僕人，後來演變成英文裡形容「無厘頭、怪誕又迷人」的絕佳詞彙。',
+        modernExample: '「生活已經夠嚴肅了，幸好身邊還有一群陪我一起做白日夢的 zany 朋友。」',
+        modernEn: 'Embracing a wonderfully zany afternoon of thrift shopping and bad poetry.',
+        motif: 'mask',
+        caption: '威尼斯嘉年華小丑面具'
+      }
+    ];
+
+    // State Management
+    let currentIndex = 0;
+    let viewMode = 'single'; // 'single' | 'grid'
+    let showFavoritesOnly = false;
+    let favorites = JSON.parse(localStorage.getItem('bards_lexicon_favorites') || '[]');
+    let activeCardTab = {}; // tracks 'literary' or 'modern' per letter
+
+    /**
+     * Bespoke SVG Engraving / Woodcut Style Art Generator
+     * Creates rich, non-breaking vintage literary illustrations for each word.
+     */
+    function generateEngravingSVG(motif, letter) {
+      const frame = `
+        <defs>
+          <pattern id="hatch-${letter}" width="6" height="6" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="0" y2="6" stroke="#722F37" stroke-width="0.6" stroke-opacity="0.16" />
+          </pattern>
+          <radialGradient id="glow-${letter}" cx="50%" cy="45%" r="55%">
+            <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.22"/>
+            <stop offset="100%" stop-color="#F5F0E6" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="260" height="320" rx="12" fill="#F3ECE0"/>
+        <rect width="260" height="320" rx="12" fill="url(#glow-${letter})"/>
+        <rect x="10" y="10" width="240" height="300" rx="8" fill="none" stroke="#1C1917" stroke-width="1.2" stroke-opacity="0.7"/>
+        <rect x="15" y="15" width="230" height="290" rx="6" fill="none" stroke="#B8860B" stroke-width="0.8" stroke-dasharray="3 2"/>
+        <!-- Corner flourishes -->
+        <circle cx="22" cy="22" r="2.5" fill="#722F37"/>
+        <circle cx="238" cy="22" r="2.5" fill="#722F37"/>
+        <circle cx="22" cy="298" r="2.5" fill="#722F37"/>
+        <circle cx="238" cy="298" r="2.5" fill="#722F37"/>
+        <!-- Top Roman Numeral / Letter Header -->
+        <text x="130" y="38" text-anchor="middle" font-family="Playfair Display, serif" font-size="13" font-weight="700" letter-spacing="4" fill="#722F37">· FOLIO ${letter} ·</text>
+      `;
+
+      const illustrations = {
+        apparition: `
+          <circle cx="130" cy="145" r="78" fill="url(#hatch-${letter})" stroke="#1C1917" stroke-width="0.8" stroke-opacity="0.3"/>
+          <path d="M95 235 C95 160, 105 115, 130 115 C155 115, 165 160, 165 235 Q148 222 130 235 Q112 222 95 235 Z" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.5"/>
+          <path d="M112 102 L118 85 L130 96 L142 85 L148 102 Z" fill="#D4AF37" stroke="#1C1917" stroke-width="1.2"/>
+          <path d="M60 245 Q130 230 200 245" stroke="#722F37" stroke-width="1.2" fill="none"/>
+          <circle cx="130" cy="145" r="4" fill="#722F37" opacity="0.6"/>
+        `,
+        hourglass: `
+          <circle cx="130" cy="155" r="76" fill="url(#hatch-${letter})"/>
+          <path d="M88 85 H172 M88 225 H172" stroke="#1C1917" stroke-width="3" stroke-linecap="round"/>
+          <path d="M96 88 C96 130, 126 145, 126 155 C126 165, 96 180, 96 222 H164 C164 180, 134 165, 134 155 C134 145, 164 130, 164 88 Z" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.6"/>
+          <path d="M106 112 H154 C150 130, 134 142, 130 148 C126 142, 110 130, 106 112 Z" fill="#D4AF37" opacity="0.75"/>
+          <path d="M102 220 C108 198, 152 198, 158 220 Z" fill="#B8860B" opacity="0.85"/>
+          <line x1="130" y1="155" x2="130" y2="205" stroke="#B8860B" stroke-width="1.2" stroke-dasharray="2 2"/>
+        `,
+        moonWindow: `
+          <path d="M80 235 V135 A50 50 0 0 1 180 135 V235 Z" fill="#1C1917" fill-opacity="0.06" stroke="#1C1917" stroke-width="1.6"/>
+          <path d="M88 235 V137 A42 42 0 0 1 172 137 V235" fill="none" stroke="#722F37" stroke-width="1"/>
+          <path d="M142 108 A22 22 0 1 0 158 142 A18 18 0 1 1 142 108 Z" fill="#D4AF37" stroke="#1C1917" stroke-width="1.2"/>
+          <line x1="130" y1="85" x2="130" y2="235" stroke="#1C1917" stroke-width="1.2"/>
+          <line x1="80" y1="165" x2="180" y2="165" stroke="#1C1917" stroke-width="1.2"/>
+          <circle cx="110" cy="118" r="1.8" fill="#722F37"/>
+          <circle cx="116" cy="135" r="1.3" fill="#722F37"/>
+        `,
+        primrose: `
+          <circle cx="130" cy="155" r="74" fill="url(#hatch-${letter})"/>
+          <path d="M130 235 C125 190, 140 165, 130 130" stroke="#1C1917" stroke-width="1.8" fill="none"/>
+          <path d="M130 195 Q102 185 95 205 Q115 212 130 195" fill="#B8860B" fill-opacity="0.3" stroke="#1C1917" stroke-width="1.2"/>
+          <path d="M132 175 Q160 165 166 185 Q146 192 132 175" fill="#B8860B" fill-opacity="0.3" stroke="#1C1917" stroke-width="1.2"/>
+          <g transform="translate(130, 125)">
+            <circle cx="0" cy="-18" r="13" fill="#FAF7F0" stroke="#722F37" stroke-width="1.4"/>
+            <circle cx="17" cy="-6" r="13" fill="#FAF7F0" stroke="#722F37" stroke-width="1.4"/>
+            <circle cx="11" cy="15" r="13" fill="#FAF7F0" stroke="#722F37" stroke-width="1.4"/>
+            <circle cx="-11" cy="15" r="13" fill="#FAF7F0" stroke="#722F37" stroke-width="1.4"/>
+            <circle cx="-17" cy="-6" r="13" fill="#FAF7F0" stroke="#722F37" stroke-width="1.4"/>
+            <circle cx="0" cy="0" r="8" fill="#D4AF37" stroke="#1C1917" stroke-width="1.2"/>
+          </g>
+        `,
+        sunset: `
+          <circle cx="130" cy="165" r="76" fill="none" stroke="#1C1917" stroke-width="1.4"/>
+          <path d="M88 165 A42 42 0 0 1 172 165 Z" fill="#722F37" fill-opacity="0.85" stroke="#1C1917" stroke-width="1.4"/>
+          <line x1="65" y1="165" x2="195" y2="165" stroke="#1C1917" stroke-width="2"/>
+          <line x1="80" y1="180" x2="180" y2="180" stroke="#B8860B" stroke-width="1.5"/>
+          <line x1="95" y1="194" x2="165" y2="194" stroke="#1C1917" stroke-width="1.2"/>
+          <line x1="112" y1="208" x2="148" y2="208" stroke="#722F37" stroke-width="1.2"/>
+          <path d="M130 98 V112 M92 114 L102 124 M168 114 L158 124" stroke="#B8860B" stroke-width="1.5" stroke-linecap="round"/>
+        `,
+        wheel: `
+          <circle cx="130" cy="155" r="68" fill="url(#hatch-${letter})" stroke="#1C1917" stroke-width="2"/>
+          <circle cx="130" cy="155" r="54" fill="#FAF7F0" stroke="#722F37" stroke-width="1.4"/>
+          <circle cx="130" cy="155" r="14" fill="#D4AF37" stroke="#1C1917" stroke-width="1.5"/>
+          <g stroke="#1C1917" stroke-width="1.3">
+            <line x1="130" y1="87" x2="130" y2="223"/>
+            <line x1="62" y1="155" x2="198" y2="155"/>
+            <line x1="82" y1="107" x2="178" y2="203"/>
+            <line x1="178" y1="107" x2="82" y2="203"/>
+          </g>
+        `,
+        lily: `
+          <rect x="75" y="85" width="110" height="145" rx="4" fill="none" stroke="#B8860B" stroke-width="2.2"/>
+          <path d="M130 220 C130 180, 125 155, 130 130" stroke="#1C1917" stroke-width="1.6" fill="none"/>
+          <path d="M130 135 C105 120, 100 95, 130 82 C160 95, 155 120, 130 135 Z" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.5"/>
+          <path d="M130 142 C95 145, 85 120, 112 108" fill="#FAF7F0" stroke="#722F37" stroke-width="1.4"/>
+          <path d="M130 142 C165 145, 175 120, 148 108" fill="#FAF7F0" stroke="#722F37" stroke-width="1.4"/>
+          <line x1="130" y1="132" x2="130" y2="105" stroke="#D4AF37" stroke-width="1.8"/>
+          <circle cx="130" cy="103" r="3" fill="#D4AF37"/>
+        `,
+        gramophone: `
+          <rect x="85" y="195" width="90" height="28" rx="3" fill="#722F37" stroke="#1C1917" stroke-width="1.5"/>
+          <ellipse cx="130" cy="190" rx="42" ry="8" fill="#1C1917"/>
+          <path d="M148 188 C158 170, 155 145, 135 135" stroke="#1C1917" stroke-width="2.5" fill="none"/>
+          <path d="M135 135 L82 95 C75 115, 78 145, 98 158 Z" fill="#D4AF37" fill-opacity="0.7" stroke="#1C1917" stroke-width="1.5"/>
+          <path d="M68 112 Q60 125 68 138 M58 105 Q46 125 58 145" stroke="#722F37" stroke-width="1.3" fill="none"/>
+        `,
+        phases: `
+          <circle cx="130" cy="155" r="72" fill="none" stroke="#1C1917" stroke-width="1" stroke-dasharray="3 3"/>
+          <circle cx="130" cy="155" r="32" fill="#D4AF37" fill-opacity="0.85" stroke="#1C1917" stroke-width="1.6"/>
+          <path d="M72 142 A14 14 0 1 0 72 168 A11 11 0 1 1 72 142 Z" fill="#722F37" stroke="#1C1917" stroke-width="1.2"/>
+          <path d="M188 142 A14 14 0 1 1 188 168 A11 11 0 1 0 188 142 Z" fill="#722F37" stroke="#1C1917" stroke-width="1.2"/>
+          <circle cx="130" cy="83" r="7" fill="#1C1917"/>
+          <circle cx="130" cy="227" r="7" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.4"/>
+        `,
+        dawn: `
+          <path d="M55 215 L105 145 L138 180 L165 135 L205 215 Z" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M105 145 L118 165 L102 172 L92 163 Z" fill="#722F37" fill-opacity="0.25"/>
+          <path d="M165 135 L178 160 L160 165 L153 155 Z" fill="#722F37" fill-opacity="0.25"/>
+          <circle cx="135" cy="112" r="22" fill="#D4AF37" stroke="#1C1917" stroke-width="1.4"/>
+          <path d="M75 195 Q130 185 185 195" stroke="#B8860B" stroke-width="1.5" fill="none"/>
+        `,
+        knaveCard: `
+          <rect x="82" y="82" width="96" height="146" rx="8" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.8"/>
+          <text x="94" y="106" font-family="Playfair Display, serif" font-size="18" font-weight="700" fill="#722F37">J</text>
+          <path d="M130 122 C115 140, 102 150, 114 164 C121 171, 128 166, 130 160 C132 166, 139 171, 146 164 C158 150, 145 140, 130 122 Z" fill="#1C1917"/>
+          <path d="M126 162 L122 178 H138 L134 162 Z" fill="#1C1917"/>
+          <text x="166" y="216" text-anchor="end" font-family="Playfair Display, serif" font-size="18" font-weight="700" fill="#722F37">J</text>
+        `,
+        wiltedRose: `
+          <circle cx="130" cy="155" r="74" fill="url(#hatch-${letter})"/>
+          <path d="M130 230 C130 190, 128 155, 146 135 C156 125, 166 132, 162 146" stroke="#1C1917" stroke-width="1.8" fill="none"/>
+          <path d="M162 146 C152 155, 150 172, 164 176 C176 172, 174 155, 162 146 Z" fill="#722F37" stroke="#1C1917" stroke-width="1.4"/>
+          <path d="M128 185 Q105 178 100 194 Q118 198 128 185" fill="#1C1917" fill-opacity="0.15" stroke="#1C1917" stroke-width="1.2"/>
+          <ellipse cx="145" cy="222" rx="8" ry="4" fill="#722F37" opacity="0.8"/>
+        `,
+        rainWindow: `
+          <rect x="82" y="84" width="96" height="142" rx="4" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.8"/>
+          <line x1="130" y1="84" x2="130" y2="226" stroke="#1C1917" stroke-width="1.4"/>
+          <line x1="82" y1="155" x2="178" y2="155" stroke="#1C1917" stroke-width="1.4"/>
+          <g stroke="#722F37" stroke-width="1.4" stroke-linecap="round">
+            <line x1="104" y1="102" x2="98" y2="122"/>
+            <line x1="118" y1="115" x2="112" y2="138"/>
+            <line x1="152" y1="100" x2="146" y2="125"/>
+            <line x1="108" y1="172" x2="100" y2="198"/>
+            <line x1="158" y1="170" x2="150" y2="195"/>
+          </g>
+        `,
+        candleSmoke: `
+          <rect x="118" y="175" width="24" height="55" rx="2" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.6"/>
+          <ellipse cx="130" cy="175" rx="12" ry="3.5" fill="#EAE2D3" stroke="#1C1917" stroke-width="1.2"/>
+          <line x1="130" y1="175" x2="130" y2="165" stroke="#1C1917" stroke-width="1.8"/>
+          <path d="M130 162 C115 145, 148 132, 128 112 C114 98, 142 86, 130 76" stroke="#722F37" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          <path d="M104 230 H156" stroke="#1C1917" stroke-width="2.2" stroke-linecap="round"/>
+        `,
+        ancientStone: `
+          <path d="M88 225 V135 A42 42 0 0 1 172 135 V225 Z" fill="#EAE2D3" stroke="#1C1917" stroke-width="1.8"/>
+          <line x1="106" y1="138" x2="154" y2="138" stroke="#722F37" stroke-width="1.5"/>
+          <line x1="102" y1="154" x2="158" y2="154" stroke="#1C1917" stroke-width="1.2"/>
+          <line x1="108" y1="170" x2="152" y2="170" stroke="#1C1917" stroke-width="1.2"/>
+          <path d="M80 225 Q105 212 130 225 Q155 212 180 225" stroke="#B8860B" stroke-width="2" fill="none"/>
+        `,
+        featherDust: `
+          <circle cx="130" cy="155" r="75" fill="url(#hatch-${letter})"/>
+          <path d="M92 212 C115 170, 145 125, 174 96 C168 128, 152 162, 118 188 Z" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.5"/>
+          <line x1="86" y1="220" x2="174" y2="96" stroke="#722F37" stroke-width="1.5"/>
+          <circle cx="96" cy="122" r="2.5" fill="#D4AF37"/>
+          <circle cx="166" cy="182" r="3" fill="#D4AF37"/>
+          <circle cx="110" cy="102" r="1.8" fill="#722F37"/>
+          <circle cx="152" cy="204" r="2" fill="#722F37"/>
+        `,
+        quill: `
+          <path d="M110 198 C122 152, 148 112, 180 84 C174 120, 158 156, 128 184 Z" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.6"/>
+          <path d="M98 222 L180 84" stroke="#722F37" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M84 198 H114 L118 226 H80 Z" fill="#1C1917"/>
+          <rect x="88" y="191" width="22" height="7" fill="#D4AF37" stroke="#1C1917" stroke-width="1.2"/>
+        `,
+        stainedGlass: `
+          <path d="M78 228 V142 C78 104, 130 82, 130 82 C130 82, 182 104, 182 142 V228 Z" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.8"/>
+          <circle cx="130" cy="134" r="24" fill="#D4AF37" fill-opacity="0.35" stroke="#722F37" stroke-width="1.5"/>
+          <line x1="130" y1="82" x2="130" y2="228" stroke="#1C1917" stroke-width="1.3"/>
+          <line x1="78" y1="168" x2="182" y2="168" stroke="#1C1917" stroke-width="1.3"/>
+          <path d="M104 228 V168 M156 228 V168" stroke="#722F37" stroke-width="1.2"/>
+        `,
+        spotlight: `
+          <polygon points="130,82 72,218 188,218" fill="#D4AF37" fill-opacity="0.22"/>
+          <ellipse cx="130" cy="218" rx="58" ry="11" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.5"/>
+          <rect x="116" y="176" width="28" height="4" fill="#722F37" stroke="#1C1917" stroke-width="1.2"/>
+          <line x1="118" y1="146" x2="118" y2="215" stroke="#1C1917" stroke-width="1.6"/>
+          <line x1="142" y1="180" x2="142" y2="215" stroke="#1C1917" stroke-width="1.6"/>
+          <line x1="118" y1="152" x2="138" y2="152" stroke="#1C1917" stroke-width="1.6"/>
+        `,
+        tempestWave: `
+          <circle cx="130" cy="155" r="74" fill="url(#hatch-${letter})" stroke="#1C1917" stroke-width="1.4"/>
+          <path d="M105 162 L155 162 L146 178 L112 178 Z" fill="#722F37" stroke="#1C1917" stroke-width="1.5"/>
+          <line x1="130" y1="112" x2="130" y2="162" stroke="#1C1917" stroke-width="1.8"/>
+          <path d="M130 115 Q154 132 130 152 Z" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.4"/>
+          <path d="M68 186 Q95 168 122 186 T176 186 T195 182" stroke="#1C1917" stroke-width="2" fill="none"/>
+          <path d="M76 202 Q105 186 134 202 T186 202" stroke="#722F37" stroke-width="1.6" fill="none"/>
+        `,
+        compassIsland: `
+          <circle cx="130" cy="155" r="66" fill="none" stroke="#1C1917" stroke-width="1.5"/>
+          <polygon points="130,94 140,145 190,155 140,165 130,216 120,165 70,155 120,145" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.4"/>
+          <polygon points="130,94 140,145 130,155" fill="#722F37"/>
+          <polygon points="130,216 120,165 130,155" fill="#D4AF37"/>
+          <circle cx="130" cy="155" r="7" fill="#1C1917"/>
+        `,
+        shield: `
+          <path d="M84 96 H176 V152 C176 192, 130 222, 130 222 C130 222, 84 192, 84 152 Z" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.8"/>
+          <path d="M92 104 H168 V150 C168 183, 130 210, 130 210 C130 210, 92 183, 92 150 Z" fill="url(#hatch-${letter})" stroke="#B8860B" stroke-width="1.2"/>
+          <line x1="130" y1="104" x2="130" y2="210" stroke="#722F37" stroke-width="2"/>
+          <line x1="92" y1="148" x2="168" y2="148" stroke="#722F37" stroke-width="2"/>
+        `,
+        candles: `
+          <rect x="94" y="135" width="22" height="88" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.6"/>
+          <rect x="144" y="155" width="22" height="68" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.6"/>
+          <path d="M105 130 C98 118, 112 110, 105 98" stroke="#722F37" stroke-width="1.4" fill="none"/>
+          <path d="M155 150 C148 138, 162 130, 155 118" stroke="#722F37" stroke-width="1.4" fill="none"/>
+          <line x1="76" y1="223" x2="184" y2="223" stroke="#1C1917" stroke-width="2.2"/>
+        `,
+        bust: `
+          <path d="M98 222 L106 195 H154 L162 222 Z" fill="#EAE2D3" stroke="#1C1917" stroke-width="1.6"/>
+          <circle cx="130" cy="134" r="26" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.6"/>
+          <path d="M102 188 C102 166, 158 166, 158 188 Z" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.6"/>
+          <path d="M106 125 Q130 105 154 125" stroke="#722F37" stroke-width="2" fill="none"/>
+        `,
+        archWindow: `
+          <path d="M84 226 V136 A46 46 0 0 1 176 136 V226 Z" fill="#1C1917" fill-opacity="0.88" stroke="#1C1917" stroke-width="1.8"/>
+          <ellipse cx="130" cy="152" rx="18" ry="26" fill="#D4AF37" fill-opacity="0.45"/>
+          <rect x="124" y="156" width="12" height="32" fill="#FAF7F0"/>
+          <path d="M130 140 Q135 148 130 154 Q125 148 130 140 Z" fill="#D4AF37"/>
+          <line x1="76" y1="226" x2="184" y2="226" stroke="#722F37" stroke-width="2.5"/>
+        `,
+        mask: `
+          <path d="M88 115 C88 95, 172 95, 172 115 C172 168, 152 208, 130 216 C108 208, 88 168, 88 115 Z" fill="#FAF7F0" stroke="#1C1917" stroke-width="1.8"/>
+          <path d="M130 100 V216" stroke="#722F37" stroke-width="1.2" stroke-dasharray="3 2"/>
+          <ellipse cx="112" cy="142" rx="9" ry="5" fill="#1C1917"/>
+          <ellipse cx="148" cy="142" rx="9" ry="5" fill="#1C1917"/>
+          <path d="M112 176 Q130 192 148 176" stroke="#722F37" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M88 115 L72 92 L102 104 M172 115 L188 92 L158 104" stroke="#D4AF37" stroke-width="1.8" fill="none"/>
+        `
+      };
+
+      const bodyArt = illustrations[motif] || illustrations.quill;
+      return `
+        <svg viewBox="0 0 260 320" class="w-full h-auto rounded-xl shadow-sm select-none" role="img" aria-label="Vintage engraving illustration for ${letter}">
+          ${frame}
+          ${bodyArt}
+          <line x1="55" y1="262" x2="205" y2="262" stroke="#1C1917" stroke-width="0.8" stroke-opacity="0.4"/>
+          <text x="130" y="280" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="13" fill="#57534E">
+            Shakespearean Woodcut Plate
+          </text>
+        </svg>
+      `;
+    }
+
+    /**
+     * Highlights the target vocabulary word inside the Shakespearean quote
+     */
+    function formatQuoteWithHighlight(quote, highlightWord) {
+      if (!highlightWord) return quote;
+      const regex = new RegExp(`\\b(${highlightWord}[a-z]*)\\b`, 'gi');
+      return quote.replace(regex, `<mark class="bg-gold/25 text-burgundy font-semibold px-1.5 py-0.5 rounded border-b border-burgundy/50">$1</mark>`);
+    }
+
+    /**
+     * Web Speech API Pronunciation Engine
+     * Supports standard RP/UK English word reading and dramatic slower quote recitation
+     */
+    function speakText(text, mode = 'word', btnElement = null) {
+      if (!('speechSynthesis' in window)) {
+        showToast('您的瀏覽器不支援語音合成功能');
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voices = window.speechSynthesis.getVoices();
+      // Prefer British English voices for authentic Shakespearean atmosphere
+      const ukVoice = voices.find(v => v.lang === 'en-GB' && (v.name.includes('Daniel') || v.name.includes('Arthur') || v.name.includes('Google') || v.name.includes('Male')))
+                   || voices.find(v => v.lang.includes('en-GB'))
+                   || voices.find(v => v.lang.includes('en'));
+
+      if (ukVoice) {
+        utterance.voice = ukVoice;
+      }
+      utterance.lang = 'en-GB';
+
+      if (mode === 'word') {
+        utterance.rate = 0.88;
+        utterance.pitch = 1.0;
+      } else {
+        // Dramatic theatrical recitation pacing
+        utterance.rate = 0.78;
+        utterance.pitch = 0.94;
+      }
+
+      if (btnElement) {
+        document.querySelectorAll('.speaking-active').forEach(el => el.classList.remove('speaking-active'));
+        btnElement.classList.add('speaking-active');
+        utterance.onend = () => btnElement.classList.remove('speaking-active');
+        utterance.onerror = () => btnElement.classList.remove('speaking-active');
+      }
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Ensure voices are loaded in Chrome/Safari
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    /**
+     * Toast Feedback Helper (No alert() used)
+     */
+    let toastTimeout;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-3');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-3');
+      }, 2600);
+    }
+
+    /**
+     * Copy Text to Clipboard (iFrame safe using execCommand fallback)
+     */
+    function copyCaption(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('已複製文青造句至剪貼簿！');
+      } catch (err) {
+        showToast('複製失敗，請手動選取文字');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    /**
+     * Favorites Management (localStorage)
+     */
+    function toggleFavorite(letter, event) {
+      if (event) event.stopPropagation();
+      const idx = favorites.indexOf(letter);
+      if (idx === -1) {
+        favorites.push(letter);
+        showToast(`已將「${letter}」收入我的藏書閣`);
+      } else {
+        favorites.splice(idx, 1);
+        showToast(`已從收藏移除「${letter}」`);
+      }
+      localStorage.setItem('bards_lexicon_favorites', JSON.stringify(favorites));
+      updateFavoritesUI();
+      renderApp();
+    }
+
+    function updateFavoritesUI() {
+      document.getElementById('fav-count').textContent = favorites.length;
+      const filterBtn = document.getElementById('btn-favorites-filter');
+      const filterIcon = document.getElementById('fav-filter-icon');
+      if (showFavoritesOnly) {
+        filterBtn.classList.add('bg-burgundy', 'text-parchment', 'border-burgundy');
+        filterBtn.classList.remove('bg-parchmentCard', 'text-ink');
+        filterIcon.classList.remove('fa-regular', 'text-burgundy');
+        filterIcon.classList.add('fa-solid', 'text-goldLight');
+      } else {
+        filterBtn.classList.remove('bg-burgundy', 'text-parchment', 'border-burgundy');
+        filterBtn.classList.add('bg-parchmentCard', 'text-ink');
+        filterIcon.classList.add('fa-regular', 'text-burgundy');
+        filterIcon.classList.remove('fa-solid', 'text-goldLight');
+      }
+    }
+
+    function toggleFavoritesFilter() {
+      showFavoritesOnly = !showFavoritesOnly;
+      updateFavoritesUI();
+      if (showFavoritesOnly && favorites.length > 0 && !favorites.includes(LEXICON_DATA[currentIndex].letter)) {
+        const firstFavIndex = LEXICON_DATA.findIndex(item => favorites.includes(item.letter));
+        if (firstFavIndex !== -1) currentIndex = firstFavIndex;
+      }
+      renderApp();
+    }
+
+    /**
+     * Navigation & View Controls
+     */
+    function selectLetter(index) {
+      currentIndex = index;
+      if (viewMode === 'grid') {
+        setViewMode('single');
+      } else {
+        renderApp();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function pickRandomWord() {
+      const pool = showFavoritesOnly && favorites.length > 0
+        ? LEXICON_DATA.map((item, idx) => favorites.includes(item.letter) ? idx : -1).filter(i => i !== -1)
+        : LEXICON_DATA.map((_, idx) => idx);
+
+      if (pool.length === 0) return;
+      let nextIdx = pool[Math.floor(Math.random() * pool.length)];
+      if (pool.length > 1 && nextIdx === currentIndex) {
+        nextIdx = pool[(pool.indexOf(nextIdx) + 1) % pool.length];
+      }
+      currentIndex = nextIdx;
+      if (viewMode === 'grid') setViewMode('single');
+      else renderApp();
+      showToast(`今日靈感抽籤：${LEXICON_DATA[currentIndex].letter} — ${LEXICON_DATA[currentIndex].word}`);
+    }
+
+    function prevWord() {
+      currentIndex = (currentIndex - 1 + LEXICON_DATA.length) % LEXICON_DATA.length;
+      renderApp();
+    }
+
+    function nextWord() {
+      currentIndex = (currentIndex + 1) % LEXICON_DATA.length;
+      renderApp();
+    }
+
+    function setViewMode(mode) {
+      viewMode = mode;
+      const singleBtn = document.getElementById('view-single-btn');
+      const gridBtn = document.getElementById('view-grid-btn');
+      if (mode === 'single') {
+        singleBtn.classList.add('bg-ink', 'text-parchment');
+        singleBtn.classList.remove('text-inkMuted');
+        gridBtn.classList.remove('bg-ink', 'text-parchment');
+        gridBtn.classList.add('text-inkMuted');
+      } else {
+        gridBtn.classList.add('bg-ink', 'text-parchment');
+        gridBtn.classList.remove('text-inkMuted');
+        singleBtn.classList.remove('bg-ink', 'text-parchment');
+        singleBtn.classList.add('text-inkMuted');
+      }
+      renderApp();
+    }
+
+    function switchCardTab(letter, tab) {
+      activeCardTab[letter] = tab;
+      renderApp();
+    }
+
+    /**
+     * Render A–Z Navigation Strip
+     */
+    function renderAZBar() {
+      const nav = document.getElementById('az-nav');
+      nav.innerHTML = LEXICON_DATA.map((item, idx) => {
+        const isActive = idx === currentIndex && viewMode === 'single';
+        const isFav = favorites.includes(item.letter);
+        const isDimmed = showFavoritesOnly && !isFav;
+
+        return `
+          <button
+            onclick="selectLetter(${idx})"
+            class="relative shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-lg font-display font-bold text-sm transition-all flex items-center justify-center cursor-pointer
+              ${isActive
+                ? 'bg-burgundy text-parchment shadow-sm scale-105 ring-2 ring-gold/50'
+                : 'bg-parchment hover:bg-parchmentDark text-ink border border-ink/10'}
+              ${isDimmed ? 'opacity-30' : 'opacity-100'}"
+          >
+            ${item.letter}
+            ${isFav ? '<span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-gold"></span>' : ''}
+          </button>
+        `;
+      }).join('');
+    }
+
+    /**
+     * Render Single Featured Showcase Card
+     */
+    function renderSingleCard(item) {
+      const isFav = favorites.includes(item.letter);
+      const currentTab = activeCardTab[item.letter] || 'literary';
+      const safeQuoteForSpeech = item.quote.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      const copyPayload = `${item.word} (${item.pos}) ${item.ipa} — ${item.modernExample} #莎翁文青詞彙誌`;
+
+      return `
+        <article class="rounded-3xl border border-ink/15 bg-parchmentCard shadow-editorial overflow-hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-12">
+            
+            <!-- Left Column: Bespoke Engraved Art Plate -->
+            <div class="lg:col-span-4 bg-parchmentDark/60 p-6 sm:p-8 flex flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-ink/10 relative">
+              <div class="w-full max-w-[250px] mx-auto transition-transform duration-500 hover:scale-[1.02]">
+                ${generateEngravingSVG(item.motif, item.letter)}
+              </div>
+              <p class="mt-3 text-xs font-serifTc text-inkMuted tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-compass-drafting text-gold"></i>
+                <span>意象圖騰：${item.caption}</span>
+              </p>
+            </div>
+
+            <!-- Right Column: Editorial Typography & Interactive Learning -->
+            <div class="lg:col-span-8 p-6 sm:p-9 flex flex-col justify-between">
+              <div>
+                <!-- Top Meta & Bookmark -->
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <div class="flex items-center gap-2.5 text-xs uppercase tracking-[0.2em] text-burgundy font-semibold">
+                      <span>LETTER ${item.letter} OF 26</span>
+                      <span>·</span>
+                      <span class="font-serifEn italic capitalize text-sm tracking-normal text-inkMuted">${item.play}</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-baseline gap-3">
+                      <h2 class="font-display text-4xl sm:text-5xl font-bold text-ink tracking-tight">
+                        ${item.word}
+                      </h2>
+                      <span class="font-serifEn italic text-xl text-burgundy font-semibold">${item.pos}</span>
+                      <span class="font-mono text-sm text-inkMuted bg-parchment px-2.5 py-0.5 rounded-md border border-ink/10">${item.ipa}</span>
+                    </div>
+                    <p class="mt-2 font-serifTc text-lg sm:text-xl font-semibold text-ink">
+                      ${item.zhMeaning}
+                    </p>
+                  </div>
+
+                  <!-- Favorite Toggle -->
+                  <button
+                    onclick="toggleFavorite('${item.letter}', event)"
+                    aria-label="收藏此詞彙"
+                    class="w-11 h-11 rounded-full border border-ink/15 bg-parchment hover:border-burgundy flex items-center justify-center text-lg transition-all active:scale-90 cursor-pointer shrink-0"
+                  >
+                    <i class="${isFav ? 'fa-solid fa-bookmark text-burgundy' : 'fa-regular fa-bookmark text-inkMuted'}"></i>
+                  </button>
+                </div>
+
+                <!-- Audio Pronunciation Controls -->
+                <div class="mt-5 flex flex-wrap items-center gap-3">
+                  <button
+                    onclick="speakText('${item.word}', 'word', this)"
+                    class="relative px-4 py-2.5 rounded-full bg-ink hover:bg-burgundy text-parchment text-xs sm:text-sm font-medium transition-all flex items-center gap-2 shadow-sm cursor-pointer"
+                  >
+                    <i class="fa-solid fa-volume-high text-goldLight"></i>
+                    <span class="font-serifTc">單字英式發音</span>
+                  </button>
+
+                  <button
+                    onclick="speakText('${safeQuoteForSpeech}', 'quote', this)"
+                    class="relative px-4 py-2.5 rounded-full border border-burgundy/40 bg-burgundy/5 hover:bg-burgundy hover:text-parchment text-burgundy text-xs sm:text-sm font-medium transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    <i class="fa-solid fa-masks-theater"></i>
+                    <span class="font-serifTc">戲劇朗誦金句</span>
+                  </button>
+                </div>
+
+                <!-- Shakespearean Quote Block -->
+                <blockquote class="mt-6 p-5 rounded-2xl bg-parchment border-l-4 border-burgundy relative">
+                  <i class="fa-solid fa-quote-left text-burgundy/15 text-3xl absolute top-3 right-4"></i>
+                  <p class="font-serifEn text-xl sm:text-2xl italic leading-relaxed text-ink">
+                    “${formatQuoteWithHighlight(item.quote, item.highlight)}”
+                  </p>
+                  <footer class="mt-2.5 text-xs font-serifEn uppercase tracking-widest text-inkMuted flex items-center justify-between">
+                    <span>— William Shakespeare, <em>${item.play}</em></span>
+                  </footer>
+                </blockquote>
+
+                <!-- Interactive Flip Tabs: Literary Note vs. Modern Hipster Usage -->
+                <div class="mt-6">
+                  <div class="flex border-b border-ink/15 gap-6">
+                    <button
+                      onclick="switchCardTab('${item.letter}', 'literary')"
+                      class="pb-2.5 text-sm font-serifTc font-semibold transition-all border-b-2 cursor-pointer ${currentTab === 'literary' ? 'border-burgundy text-burgundy' : 'border-transparent text-inkMuted hover:text-ink'}"
+                    >
+                      <i class="fa-solid fa-feather mr-1.5"></i>文青用法與賞析
+                    </button>
+                    <button
+                      onclick="switchCardTab('${item.letter}', 'modern')"
+                      class="pb-2.5 text-sm font-serifTc font-semibold transition-all border-b-2 cursor-pointer ${currentTab === 'modern' ? 'border-burgundy text-burgundy' : 'border-transparent text-inkMuted hover:text-ink'}"
+                    >
+                      <i class="fa-solid fa-mug-hot mr-1.5"></i>現代文青造句（IG 靈感）
+                    </button>
+                  </div>
+
+                  <div class="pt-4 min-h-[105px]">
+                    ${currentTab === 'literary' ? `
+                      <p class="font-serifTc text-sm sm:text-base text-ink/90 leading-relaxed">
+                        ${item.literaryNote}
+                      </p>
+                    ` : `
+                      <div class="rounded-xl bg-parchmentDark/50 p-4 border border-ink/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                          <p class="font-serifTc text-sm sm:text-base text-ink font-medium">${item.modernExample}</p>
+                          <p class="font-serifEn italic text-sm text-inkMuted">${item.modernEn}</p>
+                        </div>
+                        <button
+                          onclick='copyCaption(${JSON.stringify(copyPayload)})'
+                          class="shrink-0 px-3.5 py-2 rounded-lg bg-parchmentCard hover:bg-ink hover:text-parchment border border-ink/20 text-xs font-serifTc font-medium transition-all flex items-center gap-1.5 self-start sm:self-center cursor-pointer"
+                        >
+                          <i class="fa-regular fa-copy"></i>
+                          <span>複製文案</span>
+                        </button>
+                      </div>
+                    `}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bottom Card Stepper -->
+              <div class="mt-6 pt-4 border-t border-ink/10 flex items-center justify-between text-xs text-inkMuted font-serifTc">
+                <button onclick="prevWord()" class="hover:text-burgundy flex items-center gap-1.5 py-1 cursor-pointer">
+                  <i class="fa-solid fa-chevron-left"></i>
+                  <span>上一字：${LEXICON_DATA[(currentIndex - 1 + 26) % 26].word}</span>
+                </button>
+                <span class="font-mono text-[11px] uppercase tracking-widest text-gold font-semibold">
+                  ${currentIndex + 1} / 26
+                </span>
+                <button onclick="nextWord()" class="hover:text-burgundy flex items-center gap-1.5 py-1 cursor-pointer">
+                  <span>下一字：${LEXICON_DATA[(currentIndex + 1) % 26].word}</span>
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </article>
+      `;
+    }
+
+    /**
+     * Render Grid Item Card (All A-Z Overview Mode)
+     */
+    function renderGridCard(item, idx) {
+      const isFav = favorites.includes(item.letter);
+      return `
+        <div
+          onclick="selectLetter(${idx})"
+          class="group rounded-2xl border border-ink/15 bg-parchmentCard hover:border-burgundy/60 p-5 shadow-card hover:shadow-editorial transition-all cursor-pointer flex flex-col justify-between"
+        >
+          <div>
+            <div class="flex items-start justify-between gap-2">
+              <span class="w-8 h-8 rounded-lg bg-burgundy text-parchment font-display font-bold flex items-center justify-center text-sm">
+                ${item.letter}
+              </span>
+              <div class="flex items-center gap-1.5">
+                <button
+                  onclick="event.stopPropagation(); speakText('${item.word}', 'word', this)"
+                  title="聆聽發音"
+                  class="relative w-8 h-8 rounded-full bg-parchment hover:bg-ink hover:text-parchment border border-ink/10 flex items-center justify-center text-xs transition cursor-pointer"
+                >
+                  <i class="fa-solid fa-volume-high"></i>
+                </button>
+                <button
+                  onclick="toggleFavorite('${item.letter}', event)"
+                  title="收藏"
+                  class="w-8 h-8 rounded-full bg-parchment hover:border-burgundy border border-ink/10 flex items-center justify-center text-xs transition cursor-pointer"
+                >
+                  <i class="${isFav ? 'fa-solid fa-bookmark text-burgundy' : 'fa-regular fa-bookmark text-inkMuted'}"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <div class="flex items-baseline gap-2">
+                <h3 class="font-display text-2xl font-bold text-ink group-hover:text-burgundy transition-colors">${item.word}</h3>
+                <span class="font-serifEn italic text-sm text-inkMuted">${item.pos}</span>
+              </div>
+              <p class="font-serifTc text-sm font-medium text-ink/90 mt-0.5">${item.zhMeaning}</p>
+            </div>
+
+            <p class="mt-3 font-serifEn italic text-base text-inkMuted line-clamp-2 border-l-2 border-gold/60 pl-3">
+              “${item.quote}”
+            </p>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-ink/10 flex items-center justify-between text-xs text-inkMuted">
+            <span class="font-serifEn truncate max-w-[180px]">${item.play}</span>
+            <span class="text-burgundy font-serifTc font-medium group-hover:translate-x-0.5 transition-transform">
+              精讀 <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </span>
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Master Render Function
+     */
+    function renderApp() {
+      renderAZBar();
+
+      const singleContainer = document.getElementById('single-view-container');
+      const gridContainer = document.getElementById('grid-view-container');
+      const emptyState = document.getElementById('empty-favorites-state');
+
+      const filteredItems = showFavoritesOnly
+        ? LEXICON_DATA.filter(item => favorites.includes(item.letter))
+        : LEXICON_DATA;
+
+      if (showFavoritesOnly && filteredItems.length === 0) {
+        singleContainer.classList.add('hidden');
+        gridContainer.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      if (viewMode === 'single') {
+        singleContainer.classList.remove('hidden');
+        gridContainer.classList.add('hidden');
+        const currentItem = LEXICON_DATA[currentIndex];
+        singleContainer.innerHTML = renderSingleCard(currentItem);
+      } else {
+        singleContainer.classList.add('hidden');
+        gridContainer.classList.remove('hidden');
+        gridContainer.innerHTML = filteredItems.map(item => {
+          const originalIdx = LEXICON_DATA.findIndex(d => d.letter === item.letter);
+          return renderGridCard(item, originalIdx);
+        }).join('');
+      }
+    }
+
+    // Keyboard arrow navigation support
+    document.addEventListener('keydown', (e) => {
+      if (viewMode === 'single') {
+        if (e.key === 'ArrowLeft') prevWord();
+        if (e.key === 'ArrowRight') nextWord();
+      }
+    });
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateFavoritesUI();
+      renderApp();
+    });
+  </script>
+</body>
+</html>
